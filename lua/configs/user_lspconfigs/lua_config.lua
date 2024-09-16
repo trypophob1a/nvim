@@ -1,6 +1,6 @@
 local Lua_config = {}
 
-function Lua_config.Load(lspconfig, nvlsp)
+function Lua_config.Load(lspconfig, nvlsp, util)
   lspconfig["lua_ls"].setup {
     on_attach = nvlsp.on_attach,
     on_init = nvlsp.on_init,

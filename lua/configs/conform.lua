@@ -9,16 +9,19 @@ local options = {
       "goimports",
     },
     html = { "prettier" },
+    -- zig = { "zigfmt" },
   },
 
   format_on_save = {
     -- These options will be passed to conform.format()
     timeout_ms = 800,
-    vim.cmd [[
-       autocmd BufWritePost *.go GoImports
-    ]],
-    lsp_fallback = true,
+    lsp_fallback = true, -- Форматирование через LSP fallback, если форматтеры отсутствуют
   },
 }
+
+-- Настройка автокоманды для GoImports отдельно от таблицы
+vim.cmd [[
+  autocmd BufWritePost *.go GoImports
+]]
 
 return options

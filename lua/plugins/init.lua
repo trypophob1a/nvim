@@ -21,7 +21,9 @@ return {
       require("leap").add_default_mappings(true)
     end,
   },
-
+  -- {
+  --   "ziglang/zig.vim",
+  -- },
   {
     "nvim-treesitter/nvim-treesitter",
     opts = {
@@ -37,7 +39,8 @@ return {
         "gosum",
         "gotmpl",
         "gowork",
-        "asm",
+        -- "asm",
+        -- "zig",
       },
     },
   },
@@ -59,7 +62,8 @@ return {
         "golangci-lint-langserver",
         "gotests",
         "gomodifytags",
-        "asmfmt",
+        -- "asmfmt",
+        -- "zls",
       },
     },
   },
