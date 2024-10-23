@@ -5,8 +5,6 @@ return {
     opts = require "configs.conform",
   },
 
-  { "rush-rs/tree-sitter-asm" },
-
   {
     "neovim/nvim-lspconfig",
     config = function()
