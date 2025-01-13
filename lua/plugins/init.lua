@@ -37,7 +37,7 @@ return {
         "gosum",
         "gotmpl",
         "gowork",
-        -- "asm",
+        "asm",
         -- "zig",
       },
     },
@@ -71,6 +71,65 @@ return {
   },
 
   {
+    "yetone/avante.nvim",
+    opts = {
+      windows = {
+        wrap_line = true, -- similar to vim.o.wrap
+        width = vim.g.neovide and 40 or 30, -- default % based on available width
+        sidebar_header = {
+          align = "center", -- left, center, right for title
+          rounded = false,
+        },
+      },
+      -- your config goes here
+      provider = "gemini",
+      gemini = {
+        endpoint = "https://generativelanguage.googleapis.com/v1beta/models",
+        model = "gemini-1.5-flash-latest",
+        timeout = 30000,
+        temperature = 0,
+        max_tokens = 4096,
+
+        generationConfig = {
+          stopSequences = { "philosopher", "function" },
+        },
+      },
+    },
+    event = "VeryLazy",
+    lazy = false,
+    build = "make",
+    dependencies = {
+      "stevearc/dressing.nvim",
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
+      "hrsh7th/nvim-cmp",
+      "nvim-tree/nvim-web-devicons",
+      "zbirenbaum/copilot.lua",
+      {
+        "HakonHarnes/img-clip.nvim",
+        event = "VeryLazy",
+        opts = {
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+            use_absolute_path = true,
+          },
+        },
+      },
+      {
+        "MeanderingProgrammer/render-markdown.nvim",
+        opts = {
+          file_types = { "markdown", "Avante" },
+        },
+        ft = { "markdown", "Avante" },
+      },
+    },
+  },
+
+  {
     "ray-x/go.nvim",
     dependencies = { -- optional packages
       "ray-x/guihua.lua",
@@ -93,53 +152,92 @@ return {
     end,
   },
 
-  { "nvim-neotest/nvim-nio" },
-  {
-    "rcarriga/nvim-dap-ui",
-    config = function()
-      require("dapui").setup()
-
-      local dap, dapui = require "dap", require "dapui"
-
-      dap.listeners.after.event_initialized["dapui_config"] = function()
-        dapui.open {}
-      end
-      dap.listeners.before.event_terminated["dapui_config"] = function()
-        dapui.close {}
-      end
-      dap.listeners.before.event_exited["dapui_config"] = function()
-        dapui.close {}
-      end
-    end,
-    dependencies = {
-      "mfussenegger/nvim-dap",
-    },
-  },
-
-  {
-    "leoluz/nvim-dap-go",
-    ft = "go",
-    dependencies = { "mfussenegger/nvim-dap" },
-    --  opts = {
-    --    delve = {
-    --      detached = false,
-    --    },
-    --  },
-    config = function(_, opts)
-      require("plugins.user_plugins_configs.dap_go_config").Setup(_, opts)
-    end,
-  },
-
   {
     "mfussenegger/nvim-dap",
+    dependencies = {
+      "nvim-neotest/nvim-nio",
+      "rcarriga/nvim-dap-ui",
+      "leoluz/nvim-dap-go",
+    },
     config = function()
-      require("dap").set_log_level "TRACE"
-      require "plugins.user_plugins_configs.dap_config"
+      local dap, dapui = require "dap", require "dapui"
+
+      require("dap-go").setup()
+      dapui.setup()
+
+      -- Адаптер для gdb
+      dap.adapters.gdb = {
+        type = "executable",
+        command = "gdb",
+        args = { "--interpreter=dap", "--eval-command", "set print pretty on" },
+      }
+
+      -- Конфигурация для GAS
+      dap.configurations.asm = {
+        {
+          name = "Launch Assembly Program",
+          type = "gdb",
+          request = "launch",
+          program = function()
+            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+          end,
+          cwd = "${workspaceFolder}",
+          stopAtBeginningOfMainSubprogram = false,
+          setupCommands = {
+            {
+              text = "target record-full",
+              description = "Enable reversible debugging",
+            },
+            {
+              text = "set disassemble-next-line on",
+              description = "Automatically disassemble on stop",
+            },
+          },
+        },
+        {
+          name = "Attach to Assembly Process",
+          type = "gdb",
+          request = "attach",
+          pid = function()
+            return vim.fn.input "PID: "
+          end,
+          cwd = "${workspaceFolder}",
+        },
+      }
+
+      -- DAP UI
+      dap.listeners.before.attach.dapui_config = function()
+        dapui.open()
+      end
+      dap.listeners.before.launch.dapui_config = function()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated.dapui_config = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited.dapui_config = function()
+        dapui.close()
+      end
     end,
   },
+
   {
     "theHamsta/nvim-dap-virtual-text",
   },
+
+  -- {
+  --   "leoluz/nvim-dap-go",
+  --   ft = "go",
+  --   dependencies = { "mfussenegger/nvim-dap" },
+  --   --  opts = {
+  --   --    delve = {
+  --   --      detached = false,
+  --   --    },
+  --   --  },
+  --   config = function(_, opts)
+  --     require("plugins.user_plugins_configs.dap_go_config").Setup(_, opts)
+  --   end,
+  -- },
 
   {
     "nvim-lua/plenary.nvim",
