@@ -1,18 +1,20 @@
-local dap = {}
+local dap = require "dap"
 function dap.setup(map)
   -- Добавление точки останова
   map(
     "n",
     "<leader>db",
-    "<cmd>DapToggleBreakpoint<CR>",
+    dap.toggle_breakpoint,
     { desc = "Добавить точку останова на строке" }
   )
 
-  -- Открытие панели отладки
-  map("n", "<leader>dus", function()
-    local widgets = require "dap.ui.widgets"
-    local sidebar = widgets.sidebar(widgets.scopes)
-    sidebar.open()
-  end, { desc = "Открыть панель отладки" })
+  -- Запуск отладки
+  map("n", "<leader>dc", dap.continue, { desc = "Запуск отладки" })
+  map(
+    "n",
+    "<leader>du",
+    "<cmd>lua require'dapui'.toggle()<CR>",
+    { desc = "Открыть панель отладки" }
+  )
 end
 return dap
