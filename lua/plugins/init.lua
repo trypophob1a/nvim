@@ -37,7 +37,7 @@ return {
         "gosum",
         "gotmpl",
         "gowork",
-        "asm",
+        -- "asm",
         -- "zig",
       },
     },
