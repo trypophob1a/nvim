@@ -9,8 +9,8 @@ local checker = require "utility.modules_checker"
 
 local util = require "lspconfig/util"
 local skip = require("utility.skip_register").Add {"configs/user_lspconfigs/asm_config.lua", 
- 
-}"configs/user_lspconfigs/zig_config.lua"
+ "configs/user_lspconfigs/zig_config.lua"
+}
 fs.ReadFilesAsync(relativePath, "Error loading files", function(file)
   file = fs.RemoveLuaExtension(file)
   local success, cfg = pcall(require, "configs.user_lspconfigs." .. file)
